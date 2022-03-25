@@ -1,4 +1,4 @@
-package nsmi
+package smi
 
 import (
 	"bytes"
