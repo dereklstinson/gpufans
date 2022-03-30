@@ -23,6 +23,8 @@ void setPWM10(float f) {
 
 unsigned long volatile tachtimepin2current = 0, tachtimepin2previous = 0;//, tachcountpin2=0;
 unsigned long volatile tachtimepin3current = 0, tachtimepin3previous = 0;//, tachcountpin3=0;
+
+byte buff[12];
 //Interrupt handler. Stores the timestamps of the last 2 interrupts and handles debouncing
 
 void RisingDifferents2() {
@@ -59,14 +61,31 @@ void setup() {
   setupTimer();
   attachInterrupt(digitalPinToInterrupt(2), RisingDifferents2, RISING);
   attachInterrupt(digitalPinToInterrupt(3), RisingDifferents3, RISING);
-  setPWM9(.2f);
-  setPWM10(.2f);
-  Serial.begin(9600);  //enable serial so we can see the RPM in the serial monitor
+  setPWM9(.4f);
+  setPWM10(.4f);
+  Serial.begin(19200);  //enable serial so we can see the RPM in the serial monitor
+
 }
 void loop() {
-  delay(2000);
-  Serial.print("RPM2:");
-  Serial.println(calcRPM2());
-  Serial.print("RPM3:");
-  Serial.println(calcRPM3());
+  
+ 
+  if(Serial.available()){
+    Serial.readBytes(buff,2);
+    switch (buff[0]){
+    case 0:
+     setPWM9((float)(buff[1]));
+    break;
+    case 1:
+      setPWM10((float)(buff[1]));
+    break;
+    case 2:
+      Serial.println(calcRPM2());
+    break;
+    case 3:
+      Serial.println(calcRPM3());
+    break;
+    default:
+    break;
+  }
+  }
 }
