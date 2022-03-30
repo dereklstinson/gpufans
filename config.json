@@ -1,0 +1,15 @@
+[{
+  "Port": "/dev/ttyUSB0",
+  "Baud": 19200,
+  "Fans":[{
+          "Index": 0,
+          "GpuIDs": [0,1]
+          },
+          {
+          "Index": 1,
+          "GpuIDs": [2,3]
+          }],
+  "Temps":[30,60,90],
+  "Dutys":[10,30,100]
+}]
+
