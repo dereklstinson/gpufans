@@ -11,30 +11,32 @@ void setupTimer() {
 }
 
 //equivalent of analogWrite on pin 9
-void setPWM9(float f) {
-  f = f < 0 ? 0 : f > 1 ? 1 : f;
-  OCR1A = (uint16_t)(320 * f);
+void setPWM9(long int b) {
+  long int x = (320 * b);
+  long int y = (999);
+  OCR1A = (uint16_t)(x / y);
 }
 //equivalent of analogWrite on pin 10
-void setPWM10(float f) {
-  f = f < 0 ? 0 : f > 1 ? 1 : f;
-  OCR1B = (uint16_t)(320 * f);
+void setPWM10(long int b) {
+  long int x = (320 * b);
+  long int y = (999);
+  OCR1B = (uint16_t)(x / y);
 }
 
 unsigned long volatile tachtimepin2current = 0, tachtimepin2previous = 0;//, tachcountpin2=0;
 unsigned long volatile tachtimepin3current = 0, tachtimepin3previous = 0;//, tachcountpin3=0;
 
-byte buff[12];
+
 //Interrupt handler. Stores the timestamps of the last 2 interrupts and handles debouncing
 
 void RisingDifferents2() {
-//tachcountpin2++;
-  
+  //tachcountpin2++;
+
   tachtimepin2previous = tachtimepin2current;
   tachtimepin2current = micros();
 }
 void RisingDifferents3() {
- // tachcountpin3++;
+  // tachcountpin3++;
   tachtimepin3previous = tachtimepin3current;
   tachtimepin3current = micros();
 }
@@ -46,12 +48,12 @@ unsigned long calcRPM2() {
   //60 seconds in a minute
   //1,000,000 microseconds in a second
   //60000000ms/minute * 1 rotation/(2*difference(microseconds))
-  //30000000/difference 
-  return 30000000/difference; //rmp
+  //30000000/difference
+  return 30000000 / difference; //rmp
 }
 unsigned long calcRPM3() {
   unsigned long difference = tachtimepin3current - tachtimepin3previous;
-return 30000000/difference; //rmp
+  return 30000000 / difference; //rmp
 }
 void setup() {
   pinMode(2, INPUT);
@@ -61,31 +63,37 @@ void setup() {
   setupTimer();
   attachInterrupt(digitalPinToInterrupt(2), RisingDifferents2, RISING);
   attachInterrupt(digitalPinToInterrupt(3), RisingDifferents3, RISING);
-  setPWM9(.4f);
-  setPWM10(.4f);
+  setPWM9(300);
+  setPWM10(300);
   Serial.begin(19200);  //enable serial so we can see the RPM in the serial monitor
 
 }
+char buff[12];
 void loop() {
-  
- 
-  if(Serial.available()){
-    Serial.readBytes(buff,2);
-    switch (buff[0]){
-    case 0:
-     setPWM9((float)(buff[1]));
-    break;
-    case 1:
-      setPWM10((float)(buff[1]));
-    break;
-    case 2:
-      Serial.println(calcRPM2());
-    break;
-    case 3:
-      Serial.println(calcRPM3());
-    break;
-    default:
-    break;
-  }
+
+
+  if (Serial.available()) {
+    Serial.readBytes(buff, 4);
+    String st10 = String(buff[1]);
+    String st20 = String(buff[2]);
+    String st30 = String(buff[3]);
+    String st00 = String(st10 + st20 + st30);
+    Serial.flush();
+    switch (buff[0]) {
+      case '0':
+     setPWM9(st00.toInt());
+        break;
+      case '1':
+     setPWM10(st00.toInt());
+        break;
+      case '2':
+        Serial.println(calcRPM2());
+        break;
+      case '3':
+        Serial.println(calcRPM3());
+        break;
+      default:
+        break;
+    }
   }
 }
