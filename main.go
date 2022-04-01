@@ -59,7 +59,7 @@ func main() {
 	var smode = &serial.Config{Name: config[0].Port, Baud: config[0].Baud, Parity: serial.ParityNone, StopBits: serial.Stop1}
 	port, err := serial.OpenPort((smode))
 	if err != nil {
-		log.Panicf("error in OpenPort() %v", err)
+		log.Printf("error in OpenPort() %v\n", err)
 	}
 	defer port.Close()
 	fc := createfancurve(config[0].Temps, config[0].Dutys)
