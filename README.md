@@ -9,7 +9,7 @@ Make a arduino circuit.
 
 Make this a part of systemcl
 
-Make this or another program read the fan speeds. (If this is a part of systemcl. I think I need to make another program.)
+Make this or another program read the fan speeds. (If this is a part of systemd. I think I need to make another program.)
 
 Make sure config.json file can be read. (Might have to make a .folder in the $HOME folder for this.)
 
