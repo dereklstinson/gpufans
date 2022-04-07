@@ -7,7 +7,7 @@ To Do:
 
 Make a arduino circuit.
 
-Make this a part of systemcl
+Make this a part of systemd
 
 Make this or another program read the fan speeds. (If this is a part of systemd. I think I need to make another program.)
 

@@ -43,6 +43,7 @@ func CreateNamedPipe(rfile, wfile string) (n *Named, err error) {
 	return n, nil
 }
 func (n *Named) ReadPipe() string {
+
 	data, err := io.ReadAll(n.rpipe)
 	if err != nil {
 		return ""

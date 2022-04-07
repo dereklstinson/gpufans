@@ -16,7 +16,7 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
 
 	//arduino config defaults are 8 data bits, no parity, one stop bit.
-	ctrls := fanctrl.CreateFanControllers("config.json")
+	ctrls := fanctrl.CreateFanControllers("$HOME/diygpufanctrl/config.json")
 
 	for {
 		time.Sleep(time.Millisecond * 50)
