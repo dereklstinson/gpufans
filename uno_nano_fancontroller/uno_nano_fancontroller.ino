@@ -23,20 +23,18 @@ void setPWM10(long int b) {
   OCR1B = (uint16_t)(x / y);
 }
 
-unsigned long volatile tachtimepin2current = 0, tachtimepin2previous = 0;//, tachcountpin2=0;
-unsigned long volatile tachtimepin3current = 0, tachtimepin3previous = 0;//, tachcountpin3=0;
-
-
+unsigned long volatile tachtimepin2current = 0, tachtimepin2previous = 0, tachcountpin2 = 0;
+unsigned long volatile tachtimepin3current = 0, tachtimepin3previous = 0, tachcountpin3 = 0;
+unsigned long volatile globaltime = 0;
 //Interrupt handler. Stores the timestamps of the last 2 interrupts and handles debouncing
 
 void RisingDifferents2() {
-  //tachcountpin2++;
-
+  tachcountpin2++;
   tachtimepin2previous = tachtimepin2current;
   tachtimepin2current = micros();
 }
 void RisingDifferents3() {
-  // tachcountpin3++;
+  tachcountpin3++;
   tachtimepin3previous = tachtimepin3current;
   tachtimepin3current = micros();
 }
@@ -49,28 +47,49 @@ unsigned long calcRPM2() {
   //1,000,000 microseconds in a second
   //60000000ms/minute * 1 rotation/(2*difference(microseconds))
   //30000000/difference
-  return 30000000 / difference; //rmp
+  return 30000000 / difference; //rpm
 }
 unsigned long calcRPM3() {
   unsigned long difference = tachtimepin3current - tachtimepin3previous;
-  return 30000000 / difference; //rmp
+  return 30000000 / difference; //rpm
+
 }
+
 void setup() {
   pinMode(2, INPUT);
   pinMode(3, INPUT);
   pinMode(9, OUTPUT);
   pinMode(10, OUTPUT);
   setupTimer();
-  attachInterrupt(digitalPinToInterrupt(2), RisingDifferents2, RISING);
-  attachInterrupt(digitalPinToInterrupt(3), RisingDifferents3, RISING);
-  setPWM9(300);
-  setPWM10(300);
+
+  attachInterrupt(digitalPinToInterrupt(2), RisingDifferents2, RISING); //Fan 0
+  attachInterrupt(digitalPinToInterrupt(3), RisingDifferents3, RISING);  //Fan 1
+  setPWM9(300); //Fan 0
+  setPWM10(300); //Fan 1
   Serial.begin(19200);  //enable serial so we can see the RPM in the serial monitor
 
 }
 char buff[12];
 void loop() {
+  unsigned long nowtime = millis();
+  if ( nowtime < globaltime) {
+    globaltime = nowtime;
+    tachcountpin2 = 0;
+    tachcountpin3 = 0;
 
+  }
+  unsigned long elapsedtime = nowtime - globaltime;
+  unsigned long rpm2 = 1;
+  unsigned long rpm3 = 1;
+  if ( elapsedtime >= 5000) {
+    rpm2 = tachcountpin2 / elapsedtime;
+    rpm3 = tachcountpin3 / elapsedtime;
+    tachcountpin2 = 0;
+    tachcountpin3 = 0;
+    globaltime = nowtime;
+
+
+  }
 
   if (Serial.available()) {
     Serial.readBytes(buff, 4);
@@ -81,19 +100,30 @@ void loop() {
     Serial.flush();
     switch (buff[0]) {
       case '0':
-     setPWM9(st00.toInt());
+        setPWM9(st00.toInt());
         break;
       case '1':
-     setPWM10(st00.toInt());
+        setPWM10(st00.toInt());
         break;
       case '2':
-        Serial.println(calcRPM2());
+        if (rpm2 == 0) {
+          Serial.println("0000");
+        } else {
+          Serial.println(calcRPM2());
+        }
+
         break;
       case '3':
-        Serial.println(calcRPM3());
+        if (rpm3 == 0) {
+          Serial.println("0000");
+        } else {
+          Serial.println(calcRPM3());
+        }
+
         break;
       default:
         break;
     }
   }
+
 }

@@ -16,7 +16,7 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
 
 	//arduino config defaults are 8 data bits, no parity, one stop bit.
-	ctrls := fanctrl.CreateFanControllers("$HOME/diygpufanctrl/config.json")
+	ctrls := fanctrl.CreateFanControllers("/etc/diygpufanctrlconfigs.json")
 
 	for {
 		time.Sleep(time.Millisecond * 50)
@@ -25,10 +25,10 @@ func main() {
 			log.Println(ctx.Err())
 			for i, ctrl := range ctrls {
 				if err := ctrl.Close(); err != nil {
-					log.Printf("ctrls[%v].Close error:%v\n", i, err)
+					log.Printf("DIYGPUFANCONTROLER: ctrls[%v].Close error:%v\n", i, err)
 				}
 			}
-			fmt.Println("Interupted Program Closed with Elegance")
+			fmt.Println("DIYGPUFANCONTROLER: Interupted Program Closed with Elegance")
 			stop()
 
 			return

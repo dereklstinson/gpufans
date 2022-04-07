@@ -58,7 +58,7 @@ func CreateFanControllers(configfile string) (c []Controller) {
 		var smode = &serial.Config{Name: c[i].Port, Baud: c[i].Baud, Parity: c[i].Parity, StopBits: c[i].StopBits}
 		c[i].p, err = serial.OpenPort(smode)
 		if err != nil {
-			log.Printf("error in OpenPort() %v\n", err)
+			log.Panic("error in OpenPort()")
 		}
 	}
 

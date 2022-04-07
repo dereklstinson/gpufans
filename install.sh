@@ -2,12 +2,14 @@
 #Install script to install go programs
 
 #Build Program
-go build hpcgpufanctrl.go
+go build diygpufanctrl.go
 
-#making new directory for fan control
-mkdir $HOME/.diygpufanctrl
+#moving file and config to locations
+sudo cp diygpufanctrl /usr/local/bin
+sudo cp diygpufanctrlconfigs.json /etc
 
-mv hpcgpufanctrl $HOME/.diygpufanctrl
-mv config.json $HOME/.diygpufanctrl
-
-echo -e "PATH=$PATH:$HOME/.diygpufanctrl" >> $HOME/.profile
+sudo cp diygpufanctrl.service /etc/systemd/system
+sudo chmod 640 /etc/systemd/system/diygpufanctrl.service
+sudo systemctl daemon-reload
+sudo systemctl enable diygpufanctrl
+sudo systemctl start diygpufanctrl
